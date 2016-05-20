@@ -1,0 +1,10 @@
+@(message: String)
+
+@main("Dropbox POC for Mendeley Data") {
+
+    <h1>Connect to your Dropbox</h1>
+    <p>@message</p>
+    <img width="120px" src="/assets/images/dropbox-ios.png" />
+    <a class="btn" href="https://www.dropbox.com/1/oauth2/authorize?response_type=code&client_id=245mwy6be1gd6cd&redirect_uri=http://localhost:9000/dropbox_redirect">Authorise Dropbox</a>
+
+}
