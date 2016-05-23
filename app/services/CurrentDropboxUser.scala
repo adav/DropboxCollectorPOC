@@ -1,5 +1,6 @@
 package services
 
+import models.DropboxUser
 import play.api.Logger
 
 object CurrentDropboxUser {

@@ -4,6 +4,7 @@ package services
 import javax.inject._
 
 import akka.actor.ActorRef
+import models.DropboxUser
 import play.api.Logger
 import play.api.libs.json.JsValue
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -18,8 +19,6 @@ object DropboxService {
 
 @Singleton
 class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor: ActorRef) {
-
-  var userToken = None
 
   def testDropboxApiConnection(): Future[WSResponse] = {
     ws.url("https://api.dropboxapi.com/").get()

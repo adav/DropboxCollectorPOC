@@ -1,13 +1,20 @@
 package services.actors
 
-import akka.actor.Actor
-import play.api.Logger
-import services.{CurrentDropboxUser, DropboxUser}
+import javax.inject.Inject
 
-class NewUserActor extends Actor {
+import akka.actor.Actor
+import dao.UserDao
+import models.DropboxUser
+import play.api.Logger
+import services.CurrentDropboxUser
+
+class NewUserActor @Inject()(userDao: UserDao) extends Actor {
 
   def receive = {
-    case newUser: DropboxUser => CurrentDropboxUser.update(newUser)
+    case newUser: DropboxUser => {
+      userDao.insert(newUser)
+      Logger.info("added " + newUser.toString + " to DB")
+    }
     case _ => Logger.error("NewUserActor received unknown message")
   }
 
