@@ -6,6 +6,9 @@ GET     /                           controllers.HomeController.index
 GET     /dropbox_redirect           controllers.DropboxController.authRedirect
 GET     /list                       controllers.DropboxController.listFiles
 
+GET     /dropbox_webhook            controllers.WebhookController.webhookVerificationRequest
+POST    /dropbox_webhook            controllers.WebhookController.processWebhook
+
 GET     /count                      controllers.CountController.count
 GET     /message                    controllers.AsyncController.message
 

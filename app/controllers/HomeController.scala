@@ -10,8 +10,8 @@ import views.html
 @Singleton
 class HomeController @Inject() extends Controller {
 
-  def index = Action {
-    Ok(views.html.Application.dropboxregister("Your data"))
-  }
+  def index = Action { req =>
+    Ok(views.html.Application.dropboxregister("Your data", req.host))
 
+  }
 }

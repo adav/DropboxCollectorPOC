@@ -6,7 +6,6 @@ import akka.actor.Actor
 import dao.UserDao
 import models.DropboxUser
 import play.api.Logger
-import services.CurrentDropboxUser
 
 class NewUserActor @Inject()(userDao: UserDao) extends Actor {
 

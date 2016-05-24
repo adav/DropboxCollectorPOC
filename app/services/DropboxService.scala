@@ -30,7 +30,7 @@ class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor:
     }
   }
 
-  def registerUserCodeForToken(code: String) = {
+  def registerUserCodeForToken(code: String, host: String) = {
     val dropbox = getDropboxCredentialsConfig
 
     ws.url("https://api.dropboxapi.com/1/oauth2/token")
@@ -39,7 +39,7 @@ class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor:
         "grant_type" -> Seq("authorization_code"),
         "client_id" -> Seq(dropbox.key),
         "client_secret" -> Seq(dropbox.secret),
-        "redirect_uri" -> Seq("http://localhost:9000/dropbox_redirect")
+        "redirect_uri" -> Seq("https://" + host + "/dropbox_redirect")
       )) onComplete {
       _ map { response =>
 

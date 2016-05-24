@@ -14,12 +14,12 @@ import scala.concurrent.Future
 @Singleton
 class DropboxController @Inject()(dropbox: DropboxService, userDao: UserDao) extends Controller {
 
-  def authRedirect = Action { response =>
+  def authRedirect = Action { request =>
 
-    val userCode = response.queryString("code")
-    userCode.foreach(dropbox.registerUserCodeForToken)
+    val userCode = request.queryString("code")
+    userCode.foreach(dropbox.registerUserCodeForToken(_, request.host))
 
-    Ok("Authorised" + response.queryString)
+    Ok("Authorised" + request.queryString)
   }
 
   def listFiles = Action.async { x =>
