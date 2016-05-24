@@ -24,21 +24,21 @@ class DropboxController @Inject()(dropbox: DropboxService, userDao: UserDao) ext
 
   def listFiles = Action.async { x =>
 
-    val moo = for {
+    val futureHtmlSeq = for {
       users <- userDao.all()
     } yield users map { user =>
       for {
         jsonSeq <- dropbox.getFilesInFolder(user.token) map (_ \\ "path")
-        poo <- Future(jsonSeq.map(_.as[String]))
-        loo <- Future(poo.map("<li>" + _ + "</li>"))
-    } yield loo
+        stringSeq <- Future(jsonSeq.map(_.as[String]))
+        htmlSeq <- Future(stringSeq.map("<li>" + _ + "</li>"))
+    } yield htmlSeq
     }
 
-    val xoo = moo.map(Future.sequence(_)).flatMap(identity)
+    val everyFileTogether = futureHtmlSeq.map(Future.sequence(_)).flatMap(identity)
 
-    val soo = xoo.map(_.flatMap(identity))
+    val everyUserTogether = everyFileTogether.map(_.flatMap(identity))
 
-    soo.map { p =>
+    everyUserTogether.map { p =>
       val htmlPaths = p.map(_.mkString("<ul>", "", "</ul>"))
       Ok(views.html.Application.main("Your data files")(Html(htmlPaths.mkString)))
     }

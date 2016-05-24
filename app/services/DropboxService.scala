@@ -4,6 +4,7 @@ package services
 import javax.inject._
 
 import akka.actor.ActorRef
+import com.typesafe.config.ConfigFactory
 import models.DropboxUser
 import play.api.Logger
 import play.api.libs.json.JsValue
@@ -12,10 +13,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
-object DropboxService {
-  val appKey = ""
-  val appSecret = ""
-}
+case class DropboxAppConfig(key: String, secret: String)
 
 @Singleton
 class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor: ActorRef) {
@@ -24,7 +22,7 @@ class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor:
     ws.url("https://api.dropboxapi.com/").get()
   }
 
-  Logger.info(s"DropboxService: Starting application with Dropbox credentials hardcoded.")
+  Logger.info(s"DropboxService: Starting application with Dropbox credentials.")
   testDropboxApiConnection map { response =>
     response.status match {
       case 200 => Logger.info("DropboxService: Successfully communicating with outside world")
@@ -33,12 +31,14 @@ class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor:
   }
 
   def registerUserCodeForToken(code: String) = {
+    val dropbox = getDropboxCredentialsConfig
+
     ws.url("https://api.dropboxapi.com/1/oauth2/token")
       .post(Map(
         "code" -> Seq(code),
         "grant_type" -> Seq("authorization_code"),
-        "client_id" -> Seq(DropboxService.appKey),
-        "client_secret" -> Seq(DropboxService.appSecret),
+        "client_id" -> Seq(dropbox.key),
+        "client_secret" -> Seq(dropbox.secret),
         "redirect_uri" -> Seq("http://localhost:9000/dropbox_redirect")
       )) onComplete {
       _ map { response =>
@@ -53,7 +53,6 @@ class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor:
 
       }
     }
-
   }
 
   def getFilesInFolder(token: String, path: String = "/"): Future[JsValue] = {
@@ -64,5 +63,10 @@ class DropboxService @Inject()(ws: WSClient, @Named("new-user-actor") userActor:
         "include_media_info" -> "true"
       ).withHeaders("Authorization" -> ("Bearer " + token))
       .get map(_.json)
+  }
+
+  private def getDropboxCredentialsConfig: DropboxAppConfig = {
+    val config = ConfigFactory.load()
+    DropboxAppConfig(config.getString("dropbox.app.key"), config.getString("dropbox.app.secret"))
   }
 }
