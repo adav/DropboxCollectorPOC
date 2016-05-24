@@ -25,7 +25,7 @@ class WebhookController @Inject()(@Named("user-files-update-actor") updateActor:
     val jsonOptional = request.body.asJson
     Logger.info(jsonOptional.get.toString())
 
-    val accountWithChangesOptional = jsonOptional.map( _ \ "list_folder" \\ "accounts").map(_.map(_.as[String]))
+    val accountWithChangesOptional = jsonOptional.map( _ \\ "accounts").map(_.map(_.as[String]))
 
     accountWithChangesOptional match {
       case Some(usersWithUpdates) => usersWithUpdates.foreach( updateActor ! _ )
