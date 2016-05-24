@@ -29,6 +29,7 @@ class WebhookController @Inject()(@Named("user-files-update-actor") updateActor:
 
     accountWithChangesOptional match {
       case Some(usersWithUpdates) => usersWithUpdates.foreach( updateActor ! _ )
+      case _ => Logger.error("Optional fail "+ accountWithChangesOptional.get.mkString)
     }
 
     Ok
