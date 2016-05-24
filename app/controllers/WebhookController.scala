@@ -4,6 +4,7 @@ import javax.inject._
 
 import akka.actor.ActorRef
 import dao.UserDao
+import play.api.Logger
 import play.api.mvc._
 import play.twirl.api.Html
 import services.DropboxService
@@ -22,6 +23,8 @@ class WebhookController @Inject()(@Named("user-files-update-actor") updateActor:
 
   def processWebhook = Action { request =>
     val jsonOptional = request.body.asJson
+    Logger.info(jsonOptional.get.toString())
+
     val accountWithChangesOptional = jsonOptional.map( _ \ "list_folder" \\ "accounts").map(_.map(_.as[String]))
 
     accountWithChangesOptional match {
